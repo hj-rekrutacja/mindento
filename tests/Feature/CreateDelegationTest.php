@@ -140,5 +140,13 @@ class CreateDelegationTest extends TestCase
             'country' => 'ZZ'
         ], ['accept' => 'application/json']);
         $response->assertStatus(422);
+
+        $response = $this->post('/api/delegations', [
+            'start' => $start->clone()->addDays(7)->format('Y-m-d H:i:s'),
+            'end' => $end->clone()->addDays(7)->format('Y-m-d H:i:s'),
+            'worker_id' => $worker->id,
+            'country' => 'ZZ'
+        ], ['accept' => 'application/json']);
+        $response->assertStatus(201);
     }
 }

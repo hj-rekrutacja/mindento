@@ -17,11 +17,14 @@ class DelegationIntervalNotOverlapping implements InvokableRule, DataAwareRule
         $start = Carbon::parse($this->data['start']);
         $end = Carbon::parse($this->data['end']);
         $count = Delegation::query()
-            ->whereBetween('start', [$start, $end])
-            ->orWhereBetween('end', [$start, $end])
-            ->orWhere(function (Builder $query) use ($start, $end) {
-                $query->whereDate('start', '<', $start)->whereDate('end', '>', $end);
+            ->where(function (Builder $query) use ($start, $end){
+                $query->whereBetween('start', [$start, $end])
+                    ->orWhereBetween('end', [$start, $end])
+                    ->orWhere(function (Builder $query) use ($start, $end) {
+                        $query->where('start', '<', $start)->where('end', '>', $end);
+                    });
             })
+            ->where('worker_id', '=', $this->data['worker_id'])
             ->count();
         if ($count > 0) {
             $fail('validation.delegation_interval')->translate();
